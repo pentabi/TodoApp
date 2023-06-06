@@ -22,5 +22,19 @@
         <select asp-for="NewTodo.TodoCategory" asp-items="@Html.GetEnumSelectList<TodoCategory>()" class="form-control"></select>
         <span asp-validation-for="NewTodo.TodoCategory" class="text-danger"></span>
     </div>
+    <div class="mb-3">
+        <label>Date</label>
+        <input asp-for="NewTodo.CreatedDate" id="datepicker" name="NewTodo.CreatedDate" class="form-control" placeholder="Select a date" />
+    </div>
     <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#datepicker").datepicker({
+                dateFormat: "yy-mm-dd"
+            });
+        });
+    </script>
+}

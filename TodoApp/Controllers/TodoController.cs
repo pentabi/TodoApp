@@ -65,7 +65,7 @@ namespace TodoApp.Controllers
                 Description = todoVM.NewTodo.Description,
                 Image = todoVM.NewTodo.Image,
                 TodoCategory = todoVM.NewTodo.TodoCategory,
-                CreatedDate = DateTime.Now
+                CreatedDate = todoVM.NewTodo.CreatedDate != default ? todoVM.NewTodo.CreatedDate : DateTime.Now
             };
             _todoRepository.Add(todo);
             return RedirectToAction("Index", "Home");
