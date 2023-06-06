@@ -1,0 +1,26 @@
+﻿@using TodoApp.Data.Enum;
+@model TodoApp.ViewModels.TodoViewModel
+
+<form method="post" asp-action="Create">
+    <div class="mb-3">
+        <label asp-for="NewTodo.Title">To-do</label>
+        <input asp-for="NewTodo.Title" class="form-control" placeholder="add To-do">
+        <span asp-validation-for="NewTodo.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NewTodo.Description">details</label>
+        <textarea asp-for="NewTodo.Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NewTodo.Image">Image</label>
+        <input asp-for="NewTodo.Image" class="form-control" placeholder="insert image url">
+        <span asp-validation-for="NewTodo.Image" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NewTodo.TodoCategory">TodoCategory</label>
+        <select asp-for="NewTodo.TodoCategory" asp-items="@Html.GetEnumSelectList<TodoCategory>()" class="form-control"></select>
+        <span asp-validation-for="NewTodo.TodoCategory" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
