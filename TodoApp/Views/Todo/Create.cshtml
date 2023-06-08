@@ -9,13 +9,8 @@
     </div>
     <div class="mb-3">
         <label asp-for="NewTodo.Description">details</label>
-        <textarea asp-for="NewTodo.Description" class="form-control" rows="3"></textarea>
+        <textarea asp-for="NewTodo.Description" class="form-control pre-wrap" rows="3"></textarea>
         <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="NewTodo.Image">Image</label>
-        <input asp-for="NewTodo.Image" class="form-control" placeholder="insert image url">
-        <span asp-validation-for="NewTodo.Image" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="NewTodo.TodoCategory">TodoCategory</label>

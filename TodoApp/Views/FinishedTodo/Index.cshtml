@@ -4,35 +4,59 @@
 }
 
 <style>
-    .list-group-item {
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
+    .normal {
+        background-color: white;
     }
 
-        .list-group-item:hover {
-            border-color: #6c757d;
-        }
+    .event {
+        background-color: #ffe6ff;
+    }
+
+    .work {
+        background-color: AliceBlue;
+    }
+
+    .personal {
+        background-color: OldLace;
+    }
 </style>
 
+
 <div class="list-group">
-    @if (Model != null)
+    @if (Model.FinishedTodoList != null && Model.FinishedTodoList.Any())
     {
-        @foreach (var group in Model.FinishedTodoList.OrderBy(t => t.CreatedDate).GroupBy(t => t.CreatedDate.Date))
+        @foreach (var group in Model.FinishedTodoList.OrderBy(t => t.CreatedDate).GroupBy(t => t.CreatedDate.Date).Reverse())
         {
-            <h4 class="mb-3 mt-0">@group.Key.ToString("yyyy-MM-dd")</h4>
+            var groupDate = group.Key.Date;
+            var today = DateTime.Today;
+            var daysAgo = (today - groupDate).Days;
+
+            <div class="d-flex align-items-end">
+            <h4 class="mt-3">@group.Key.ToString("yyyy-MM-dd")</h4>
+                @if (groupDate == today)
+                {
+                    <small class="text-muted mb-2 mx-2">today</small>
+                }
+                else if(daysAgo == 1)
+                {
+                    <small class="text-muted mb-2 mx-2">1 day ago</small>
+                }else{
+                    <small class="text-muted mb-2 mx-2">@daysAgo days ago</small>
+                }
+            
+            </div>
             @foreach (var item in group)
             {
-                <div class="list-group-item d-flex justify-content-between align-items-center mb-1">
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            @item.Title
-                            <small class="text-muted">@item.Description</small>
-                        </label>
-                    </div>
+                var categoryClass = item.TodoCategory.ToString().ToLower(); // Convert category to lowercase
+                var truncatedDescription = item.Description != null && item.Description.Length > 50 ? $"{item.Description.Substring(0, 50)}..." : item.Description;
+
+                <div class="list-group-item d-flex justify-content-between align-items-center mb-1  shadow-sm border-top @(categoryClass)" onclick="location.href='@Url.Action("Detail", "FinishedTodo", new { id = item.Id })';">
                     <div>
-                        <small class="text-muted">@item.CreatedDate.ToString("yyyy-MM-dd")</small>
-                        <a asp-controller="FinishedTodo" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1">View</a>
-                        <a asp-controller="FinishedTodo" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1">Edit</a>
+                            @item.Title
+                        <small class="text-muted">@truncatedDescription</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted text-nowrap">@item.CreatedDate.ToString("yyyy-MM-dd")</small>
                         <a asp-controller="FinishedTodo" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 alert-danger">Delete</a>
                     </div>
                 </div>
@@ -41,9 +65,6 @@
     }
     else
     {
-        <p>No todos found.</p>
+        <h4 class="mb-3">No Completed todos found.</h4>
     }
-    <div class="p-3">
-        <a asp-controller="Todo" asp-action="Create" class="btn btn-sm btn-primary">Create</a>
-    </div>
 </div>

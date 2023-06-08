@@ -1,7 +1,26 @@
-﻿@model TodoApp.ViewModels.TodoViewModel
+﻿@using TodoApp.Data.Enum;
+@model TodoApp.ViewModels.TodoViewModel
 @{
     ViewData["Title"] = "Todo Page";
 }
+<style>
+    .normal {
+        background-color: white;
+    }
+
+    .event {
+        background-color: #ffe6ff;
+    }
+
+    .work {
+        background-color: AliceBlue;
+    }
+
+    .personal {
+        background-color: OldLace;
+    }
+
+</style>
 
 <div class="container py-5">
     <form method="post" asp-controller="Todo" asp-action="Create">
@@ -19,45 +38,91 @@
                     </div>
                 </div>
             </div>
-        <div class="mb-3 py-1">
-            <input asp-for="NewTodo.Description" class="form-control form-control-lg" placeholder="   Details..."></input>
-            <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
+        <div class="d-flex align-content-end justify-content-between">
+            <div class="py-1" style="flex-basis: 80%;">
+                <input asp-for="NewTodo.Description" class="form-control form-control-lg pre-wrap" placeholder="   Details..."></input>
+                <span asp-validation-for="NewTodo.Description" class="text-danger"></span>
+            </div>
+            <div class="py-1" style="flex-basis: 19%;">
+                <select asp-for="NewTodo.TodoCategory" asp-items="@Html.GetEnumSelectList<TodoCategory>()" class="form-control form-control-lg text-muted"></select>
+                <span asp-validation-for="NewTodo.TodoCategory" class="text-danger"></span>
+            </div>
         </div>
+
     </form>
 
     <hr class="my-4">
 
+    @if (Model != null && Model.TodoList.Any())
+    {
+        <div>
+            <a asp-controller="Todo" asp-action="Create" class="btn btn-primary">Create</a>
+        </div>
+    }
+    else
+    {
+        <h3>or</h3>
+        <div class="d-flex align-items-center">
+            <div>
+                <a asp-controller="Todo" asp-action="Create" class="btn btn-primary">Create</a>
+            </div>
+            <h3 class="text-muted ms-3">Create new Todo with more description</h3>
+        </div>
+    }
     <div class="list-group">
-        @if (Model != null)
+        @if (Model != null && Model.TodoList.Any())
         {
-            @foreach (var item in Model.TodoList)
-            {
-                <div class="list-group-item d-flex justify-content-between align-items-center mb-3  shadow-sm">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="">
-                        <label class="form-check-label">
-                            @item.Title
-                            <small class="text-muted">@item.Description</small>
-                        </label>
-                    </div>
-                    <div>
-                        <small class="text-muted">@item.CreatedDate.ToString("yyyy-MM-dd")</small> <!-- Add the small date here -->
-                        <a asp-controller="Todo" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 shadow-sm">View</a>
-                        <a asp-controller="Todo" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 shadow-sm">Edit</a>
-                        <a asp-controller="Todo" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 alert-danger shadow-sm">Delete</a>
+            var today = DateTime.Today;
 
+            @foreach (var group in Model.TodoList.OrderBy(t => t.CreatedDate).GroupBy(t => t.CreatedDate.Date))
+            {
+                var groupDate = group.Key.Date;
+                var daysLeft = (groupDate - today).Days;
+
+                <h4 class="mt-3 @(groupDate == today ? "" : "text-muted small")">
+                    @(groupDate == today ? "Today" : groupDate.ToString("yyyy-MM-dd"))
+                    @if (groupDate != today)
+                    {
+                        @if (daysLeft == 1)
+                        {
+                            <span>(1 day left)</span>
+                        }
+                        else
+                        {
+                            <span>(@daysLeft days left)</span>
+                        }
+                    }
+                </h4>
+                @foreach (var item in group)
+                {
+                    var categoryClass = item.TodoCategory.ToString().ToLower(); // Convert category to lowercase
+                    var truncatedDescription = item.Description != null && item.Description.ToString().Length > 50 ? $"{item.Description.ToString().Substring(0, 50)}..." : item.Description; //make description ... if too long
+
+                    <div class="list-group-item d-flex justify-content-between align-items-center mb-1  shadow-sm border-top @(categoryClass)" onclick="location.href='@Url.Action("Detail", "Todo", new { id = item.Id })';">
+                        <div>
+                                @item.Title
+                            <small class="text-muted">@truncatedDescription</small>
+                        </div>
+                    <div class="d-flex align-items-center">
+                            <small class="text-muted text-nowrap">@item.CreatedDate.ToString("yyyy-MM-dd")</small> <!-- Add the small date here -->
+                            <a asp-controller="Todo" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 shadow-sm">Edit</a>
+                            <a asp-controller="Todo" asp-action="@(groupDate == today ? "Delete" : "DeleteFr")" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary mx-1 shadow-sm @(groupDate == today ? "alert-info" : "alert-danger")">
+                                @(groupDate == today ? "Complete" : "Delete")
+                            </a>
+                        </div>
                     </div>
-                </div>
+                }
+                if(groupDate == today)
+                {
+                    <hr class="my-4">
+                    <h4 class="mb-3">Future Events/Todo</h4>
+                }
+                
             }
         }
         else
         {
-            <p>No todos found.</p> <!-- Display a message if Model is null -->
+            <h4 class="mb-3">No Todos found, create one!</h4>
         }
-        <div class="p-3">
-            <a asp-controller="Todo" asp-action="Create" class="btn btn-sm btn-primary">Create</a>
-        </div>
-
-
     </div>
 </div>

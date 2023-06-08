@@ -39,5 +39,11 @@ namespace TodoApp.Controllers
 
             return RedirectToAction("Index", "FinishedTodo");
         }
+
+        public async Task<IActionResult> Detail(int id)
+        {
+            FinishedTodo todo = await _finishedTodoRepository.GetByIdAsync(id);
+            return View(todo);
+        }
     }
 }

@@ -84,6 +84,18 @@ namespace TodoApp.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+        public async Task<IActionResult> DeleteFr(int id)
+        {
+            var todo = await _todoRepository.GetByIdAsync(id);
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+            _todoRepository.Delete(todo);
+
+            return RedirectToAction("Index", "Home");
+        }
 
         [HttpPost]
         public async Task<IActionResult> Edit(Todo todo)
@@ -104,6 +116,7 @@ namespace TodoApp.Controllers
             currentTodo.Title = todo.Title;
             currentTodo.Description = todo.Description;
             currentTodo.TodoCategory = todo.TodoCategory;
+            currentTodo.CreatedDate = todo.CreatedDate;
 
             //Update
             _todoRepository.Update(currentTodo);

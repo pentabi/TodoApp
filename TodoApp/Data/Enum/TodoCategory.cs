@@ -1,9 +1,12 @@
-﻿namespace TodoApp.Data.Enum
+﻿using System.ComponentModel;
+
+namespace TodoApp.Data.Enum
 {
     public enum TodoCategory
     {
-        High,
-        Medium,
-        Low
+        Normal,
+        Event,
+        Work,
+        Personal
     }
 }
